@@ -93,6 +93,75 @@ def bfs(Grid, dest: Grid_Position, start: Grid_Position):
                 queue.append(nextCell)
     return [], -1
 
+#Iterative DFS algo for the maze
+def iterativeDfs(Grid, dest: Grid_Position, start: Grid_Position):
+    adj_cell_x = [+1, +0, +0, -1]
+    adj_cell_y = [+0, +1, -1, +0]
+    rows, columns = (len(Grid), len(Grid[0]))
+    visited_blocks = [[False for i in range(columns)]
+               for j in range(rows)]
+    
+    previousBlock = [[Grid_Position(-1, -1) for i in range(columns)]
+                for j in range(rows)]
+    visited_blocks[start.x][start.y] = True
+    stack = deque()
+    sol = Node(start, 0)
+    stack.append(sol)
+
+    cells = 4
+    cost = 0
+    while stack:
+        current_block = stack.pop()
+        current_pos = current_block.pos
+        cost = cost + 1
+
+        if current_pos.x == dest.x and current_pos.y == dest.y:
+            print("Algorithm used = Iterative DFS")
+            print("Path found!!")
+            print("Total nodes visited = ", cost)
+            return recoverThePath(previousBlock, dest, start), current_block.cost
+     
+        for i in range(cells):
+            newX = current_pos.x + adj_cell_x[i]
+            newY = current_pos.y + adj_cell_y[i]
+            newPosition = Grid_Position(newX, newY)
+            if newPosition.inside(rows, columns) == True and Grid[newX][newY] == 1 and not visited_blocks[newX][newY]:
+                nextCell = Node(newPosition, current_block.cost + 1)
+                visited_blocks[newX][newY] = True
+                previousBlock[newX][newY] = current_pos    
+                stack.append(nextCell)
+    return [], -1
+
+#Recursive DFS algo for the maze
+"""def recursiveDfs(Grid, dest: Grid_Position, start: Grid_Position):    
+    adj_cell_x = [+1, +0, +0, -1]
+    adj_cell_y = [+0, +1, -1, +0]
+    rows, columns = (len(Grid), len(Grid[0]))
+    visited_blocks[start.x][start.y] = True
+    
+    sol = Node(start, 0)
+    current_pos = sol.pos
+
+    cells = 4
+    cost = 0
+    while current_pos.x != dest.x and current_pos.y != dest.y:
+        if current_pos.x == dest.x and current_pos.y == dest.y:
+            print("Algorithm used = Recursive DFS")
+            print("Path found!!")
+            print("Total nodes visited = ", cost)
+            return recoverThePath(previousBlock, dest, start), cost
+        print(current_pos.x, current_pos.y)
+        cost = cost + 1
+        for i in range(cells):
+            newX = current_pos.x + adj_cell_x[i]
+            newY = current_pos.y + adj_cell_y[i]
+            newPosition = Grid_Position(newX, newY)
+            if current_pos.inside(rows, columns) == True and Grid[newX][newY] == 1 and not visited_blocks[newX][newY]:
+                previousBlock[newX][newY] = current_pos
+                print (newPosition.x, newPosition.y)
+                recursiveDfs(Grid, dest, newPosition)
+    return [], -1"""
+
 
 def main():
     noPath = True
@@ -115,7 +184,7 @@ def main():
         # destination = Grid_Position(10, 0)
         # starting_position = Grid_Position(4, 11)
 
-        path, res = bfs(maze, destination, starting_position)
+        path, res = iterativeDfs(maze, destination, starting_position)
         if res != -1:
             for row in range(len(maze)):
                 for column in range(len(maze[0])):
